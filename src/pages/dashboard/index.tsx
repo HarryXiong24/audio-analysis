@@ -34,7 +34,9 @@ const Dashboard = () => {
 
   return (
     <div className={styles.dashboard}>
-      <h2 className="p-0 text-start text-3xl font-semibold">Dashboard</h2>
+      <h2 className="p-0 text-start text-3xl font-semibold">
+        Review your AI Interview
+      </h2>
 
       <div className={styles.container}>
         <div className={styles.column}>
