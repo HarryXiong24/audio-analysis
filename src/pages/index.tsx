@@ -10,7 +10,6 @@ export default function Home() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        background: "rgb(249, 250, 251)",
         height: "100vh",
       }}
     >
