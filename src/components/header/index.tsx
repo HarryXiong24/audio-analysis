@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { Avatar, AvatarImage } from "../ui/avatar";
+import { UrlDirection } from "@/pages/_app";
 
-const Header = () => {
+const Header = (props: { changeUrl: (param: string) => void }) => {
+  const { changeUrl } = props;
+
   return (
     <header className="sticky top-0 z-50 h-16 w-full border-b backdrop-blur transition-all duration-200 max-md:bg-white/80 md:border-b-transparent md:bg-[rgb(249_250_251)]">
       <div className="mx-auto flex h-full max-w-5xl items-center justify-between px-4">
@@ -10,7 +13,10 @@ const Header = () => {
             <Link
               className="flex flex-row items-center justify-center gap-x-1.5 text-lg font-medium leading-none text-black dark:text-white"
               aria-label="MockAI"
-              href="https://www.aceinterview.app/"
+              href="/"
+              onClick={() => {
+                changeUrl(UrlDirection.Home);
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -42,31 +48,46 @@ const Header = () => {
             </Link>
             <Link
               className="text-muted-foreground hover:text-primary"
-              href="https://www.aceinterview.app/interviews"
+              href="/"
+              onClick={() => {
+                changeUrl(UrlDirection.Interviews);
+              }}
             >
               Interviews
             </Link>
             <Link
               className="text-muted-foreground hover:text-primary"
-              href="https://www.aceinterview.app/career"
+              href="/"
+              onClick={() => {
+                changeUrl(UrlDirection.Career);
+              }}
             >
               Career
             </Link>
             <Link
               className="text-muted-foreground hover:text-primary"
-              href="https://www.aceinterview.app/blog"
+              href="/"
+              onClick={() => {
+                changeUrl(UrlDirection.Blog);
+              }}
             >
               Blog
             </Link>
             <Link
               className="text-muted-foreground hover:text-primary"
-              href="https://www.aceinterview.app/#pricing"
+              href="/"
+              onClick={() => {
+                changeUrl(UrlDirection.Pricing);
+              }}
             >
               Pricing
             </Link>
             <Link
               className="text-muted-foreground hover:text-primary"
-              href="https://www.aceinterview.app/contact-us"
+              href="/"
+              onClick={() => {
+                changeUrl(UrlDirection.ContactUs);
+              }}
             >
               Contact Us
             </Link>

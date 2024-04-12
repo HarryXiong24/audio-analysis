@@ -1,25 +1,15 @@
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/router";
-
-export default function Home() {
-  const router = useRouter();
+export default function Home(props: { url: string }) {
+  const { url } = props;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-      }}
-    >
-      <Button
-        onClick={() => {
-          router.push("/dashboard");
-        }}
-      >
-        Welcome to Dashboard
-      </Button>
-    </div>
+    <iframe
+      src={url}
+      width="100%"
+      height="100&"
+      className="fixed inset-0 w-full h-full"
+      frameBorder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowFullScreen
+    ></iframe>
   );
 }

@@ -1,0 +1,12 @@
+.audio-player {
+  .control-bar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    .drop {
+      background-color: white;
+      border-radius: 0.5rem;
+    }
+  }
+}
