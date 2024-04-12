@@ -149,7 +149,7 @@ const AudioPlayer = () => {
                 {speed}x
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white">
+            <DropdownMenuContent className="bg-slate-200 z-1000">
               <DropdownMenuRadioGroup
                 value={speed}
                 onValueChange={(value) => {

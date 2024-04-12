@@ -78,3 +78,10 @@
 body {
   background-color: rgb(249, 250, 251);
 }
+
+.text-purple-gradient {
+  display: inline-block;
+  background: linear-gradient(90deg, #6b70ff, #f8adff);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

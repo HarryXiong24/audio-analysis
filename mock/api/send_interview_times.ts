@@ -1,4 +1,7 @@
-import { InterviewTime } from "@/types";
+export interface InterviewTime {
+  id: string;
+  time: string;
+}
 
 export const sendInterviewTimes = () => {
   const mockData: InterviewTime[] = [
