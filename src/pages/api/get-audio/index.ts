@@ -11,7 +11,7 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const filePath = path.resolve("./public/audio", "demo.wav");
+  const filePath = path.resolve("./mock/audio", "demo.wav");
 
   const stat = fs.statSync(filePath);
   const fileSize = stat.size;

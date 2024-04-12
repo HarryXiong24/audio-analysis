@@ -3,10 +3,14 @@ import { useWavesurfer } from "@wavesurfer/react";
 import { formatTime } from "@/lib/format-time";
 import { Button } from "@/components/ui/button";
 import Timeline from "wavesurfer.js/dist/plugins/timeline.esm.js";
-import styles from "./index.module.scss";
-import { FastForward, Pause, Play, Rewind } from "lucide-react";
-import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.js";
-import Hover from "wavesurfer.js/dist/plugins/hover.js";
+import {
+  ArrowDownToLine,
+  FastForward,
+  Pause,
+  Play,
+  Rewind,
+} from "lucide-react";
+import { saveAs } from "file-saver";
 import {
   Card,
   CardContent,
@@ -24,6 +28,9 @@ import {
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import { DropdownMenuRadioItem } from "../ui/dropdown-menu";
+import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js";
+import Hover from "wavesurfer.js/dist/plugins/hover.esm.js";
+import Minimap from "wavesurfer.js/dist/plugins/minimap.esm.js";
 
 const AudioPlayer = () => {
   const audioRef = useRef(null);
@@ -31,8 +38,8 @@ const AudioPlayer = () => {
 
   const { wavesurfer, isPlaying, currentTime } = useWavesurfer({
     container: audioRef,
-    width: "50vw",
-    height: 100,
+    width: "40vw",
+    height: 120,
     waveColor: "rgb(200, 0, 200)",
     progressColor: "rgb(100, 0, 100)",
     url: "/api/get-audio",
@@ -59,6 +66,11 @@ const AudioPlayer = () => {
             labelColor: "#fff",
             labelSize: "11px",
           }),
+          Minimap.create({
+            height: 20,
+            waveColor: "#ddd",
+            progressColor: "#999",
+          }),
         ];
       }
     }, []),
@@ -76,24 +88,33 @@ const AudioPlayer = () => {
     wavesurfer && wavesurfer.skip(-5);
   }, [wavesurfer]);
 
+  const onSpeedChange = useCallback(
+    (value: string) => {
+      wavesurfer && wavesurfer.setPlaybackRate(parseFloat(value), true);
+    },
+    [wavesurfer]
+  );
+
   const duration = wavesurfer && wavesurfer.getDuration();
 
   return (
-    <Card className={styles["audio-player"]}>
+    <Card>
       <CardHeader>
-        <CardTitle>Create project</CardTitle>
-        <CardDescription>Deploy your new project in one-click.</CardDescription>
+        <CardTitle>Interview audio playback</CardTitle>
+        <CardDescription className="text-base text-neutral-500">
+          Get detailed scores and advice by playback your audio.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div ref={audioRef}></div>
       </CardContent>
-      <CardFooter className={styles["control-bar"]}>
+      <CardFooter className="grid grid-cols-3 gap-4">
         <div>
           <Button
             onClick={onRewind}
             variant="ghost"
             size="icon"
-            style={{ marginRight: 4 }}
+            className="text-base text-neutral-500 mr-2"
           >
             <Rewind />
           </Button>
@@ -101,7 +122,7 @@ const AudioPlayer = () => {
             onClick={onPlayPause}
             variant="ghost"
             size="icon"
-            style={{ marginRight: 4 }}
+            className="text-base text-neutral-500 mr-2"
           >
             {isPlaying ? <Pause /> : <Play />}
           </Button>
@@ -109,27 +130,33 @@ const AudioPlayer = () => {
             onClick={onFastForward}
             variant="ghost"
             size="icon"
-            style={{ marginRight: 4 }}
+            className="text-base text-neutral-500 mr-2"
           >
             <FastForward />
           </Button>
         </div>
-        <div>
+        <div className="text-base text-neutral-500 text-center">
           {formatTime(currentTime)} / {formatTime(duration)}
         </div>
-        <div>
+        <div className="flex justify-end">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
+            <DropdownMenuTrigger asChild className="mr-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-lg text-neutral-500"
+              >
                 {speed}x
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className={styles.drop}>
+            <DropdownMenuContent className="bg-white">
               <DropdownMenuRadioGroup
                 value={speed}
                 onValueChange={(value) => {
+                  onSpeedChange(value);
                   setSpeed(value);
                 }}
+                className="p-2"
               >
                 <DropdownMenuRadioItem value="0.5">0.5</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="1">1</DropdownMenuRadioItem>
@@ -138,6 +165,22 @@ const AudioPlayer = () => {
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-base text-neutral-500"
+            onClick={async () => {
+              try {
+                const response = await fetch("/api/download-audio");
+                const blob = await response.blob();
+                saveAs(blob, "demo.wav");
+              } catch (e) {
+                console.log(e);
+              }
+            }}
+          >
+            <ArrowDownToLine />
+          </Button>
         </div>
       </CardFooter>
     </Card>
