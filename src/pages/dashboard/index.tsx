@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import Footer from "@/components/layout/footer";
 
 export const ScoreCriteria = {
+  overall: "Overall",
   algorithm: "Algorithm",
   coding: "Coding",
   communication: "Communication",
@@ -24,7 +25,18 @@ const Dashboard = (props: {
   overallData: OverallData;
 }) => {
   const { interviewTimes, overallData } = props;
+
   const router = useRouter();
+
+  const handleRadarScore = (): number[] => {
+    const radarScore: number[] = [];
+    Object.keys(overallData.score).forEach((item) => {
+      if (item !== "overall") {
+        radarScore.push(overallData.score[item]);
+      }
+    });
+    return radarScore;
+  };
 
   return (
     <>
@@ -61,6 +73,12 @@ const Dashboard = (props: {
                       {overallData.averageTimeConsumed || "-"} min
                     </span>
                   </p>
+                  <p className="text-lg text-neutral-500 pb-2">
+                    Problem Correct Rate:
+                    <span className="px-1">
+                      {overallData.problemCorrectRate * 100 || "-"} %
+                    </span>
+                  </p>
                 </div>
                 <div>
                   <Button
@@ -75,7 +93,7 @@ const Dashboard = (props: {
                 </div>
               </div>
               <div className="flex-1">
-                <RadarChart value={Object.values(overallData.score)} />
+                <RadarChart value={handleRadarScore()} />
               </div>
             </div>
           </CardContent>
@@ -83,8 +101,8 @@ const Dashboard = (props: {
 
         <Card className="mt-6">
           <CardContent className="p-6">
-            <Tabs defaultValue="algorithm">
-              <TabsList className="grid grid-cols-4 w-[520px]">
+            <Tabs defaultValue="overall">
+              <TabsList className="grid grid-cols-5 w-[620px]">
                 {Object.keys(overallData.score).map((item, index) => (
                   <TabsTrigger value={item} key={index}>
                     {ScoreCriteria[item as keyof typeof ScoreCriteria]}
@@ -95,14 +113,6 @@ const Dashboard = (props: {
                 return (
                   <TabsContent value={item} key={index}>
                     <div className="mt-2 flex gap-x-8">
-                      <div className="flex-1">
-                        <GaugeChart
-                          name={
-                            ScoreCriteria[item as keyof typeof ScoreCriteria]
-                          }
-                          value={overallData.score[item]}
-                        />
-                      </div>
                       <div className="flex-1 flex justify-center items-center">
                         <p className="text-base text-neutral-500 ">
                           {
@@ -113,6 +123,14 @@ const Dashboard = (props: {
                             ).suggestion
                           }
                         </p>
+                      </div>
+                      <div className="flex-1 flex justify-center items-center">
+                        <GaugeChart
+                          name={
+                            ScoreCriteria[item as keyof typeof ScoreCriteria]
+                          }
+                          value={overallData.score[item]}
+                        />
                       </div>
                     </div>
                   </TabsContent>

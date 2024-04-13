@@ -1,8 +1,13 @@
 import * as echarts from "echarts";
 import EChart from "../common/echarts";
+import { CSSProperties } from "react";
 
-const GaugeChart = (props: { name: string; value: number }) => {
-  const { name, value } = props;
+const GaugeChart = (props: {
+  name: string;
+  value: number;
+  style?: CSSProperties;
+}) => {
+  const { name, value, style = { width: "80%", height: 220 } } = props;
 
   return (
     <EChart
@@ -14,6 +19,7 @@ const GaugeChart = (props: { name: string; value: number }) => {
             },
             name: name,
             type: "gauge",
+            splitNumber: 8,
             progress: {
               show: true,
               itemStyle: {
@@ -56,7 +62,7 @@ const GaugeChart = (props: { name: string; value: number }) => {
           },
         ],
       }}
-      style={{ width: "60%", height: 230 }}
+      style={style}
     />
   );
 };
