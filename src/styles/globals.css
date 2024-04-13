@@ -85,3 +85,18 @@ body {
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+.typewriter {
+  display: inline-block;
+}
+
+.cursor {
+  font-weight: bold;
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
