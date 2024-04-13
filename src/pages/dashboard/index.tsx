@@ -1,15 +1,4 @@
-import { useState } from "react";
-import AudioPlayer from "@/components/audio-player";
-import {
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { GetServerSidePropsContext } from "next";
-import dynamic from "next/dynamic";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tabs } from "@radix-ui/react-tabs";
@@ -20,13 +9,7 @@ import { ChevronRight } from "lucide-react";
 import { InterviewTime, OverallData } from "@/types";
 import { getInterviewTimes } from "@/services/get-interview-times";
 import { getOverallData } from "@/services/get-overall-data";
-
-const Select = dynamic(
-  () => import("@/components/ui/select").then((mod) => mod.Select),
-  {
-    ssr: false,
-  }
-);
+import { useRouter } from "next/navigation";
 
 export const ScoreCriteria = {
   algorithm: "Algorithm",
@@ -40,34 +23,14 @@ const Dashboard = (props: {
   overallData: OverallData;
 }) => {
   const { interviewTimes, overallData } = props;
-  const [time, setTime] = useState<string>(interviewTimes[0].id);
+  const router = useRouter();
 
   return (
     <div className="mx-auto max-w-5xl grow px-4 pt-10 h-full w-full duration-300 ease-in-out animate-in fade-in slide-in-from-bottom-4">
-      <div className="flex justify-between items-center">
+      <div>
         <h3 className="p-0 text-start text-3xl font-semibold text-purple-gradient">
           Welcome back, Harry!
         </h3>
-        <Select
-          value={time}
-          onValueChange={(time) => {
-            setTime(time);
-          }}
-        >
-          <SelectTrigger className="w-56">
-            <SelectValue placeholder="Select your interview record" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Interview Record</SelectLabel>
-              {interviewTimes?.map((item, index) => (
-                <SelectItem value={item.id} key={index}>
-                  {item.time}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
       </div>
 
       <Card className="mt-6">
@@ -98,7 +61,12 @@ const Dashboard = (props: {
                 </p>
               </div>
               <div>
-                <Button className="inline-flex items-center whitespace-nowrap font-medium shadow ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 group/cta text-md justify-start rounded-full">
+                <Button
+                  className="inline-flex items-center whitespace-nowrap font-medium shadow ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 group/cta text-md justify-start rounded-full"
+                  onClick={() => {
+                    router.push(`/dashboard/detail/${interviewTimes[1].id}`);
+                  }}
+                >
                   Check your interview details
                   <ChevronRight className="lucide lucide-chevron-right ml-2 transition duration-200 group-hover/cta:translate-x-2" />
                 </Button>
@@ -146,14 +114,6 @@ const Dashboard = (props: {
           </Tabs>
         </CardContent>
       </Card>
-      {/* 
-      <div className="flex gap-x-8">
-        <div className="flex-1 ">
-          <AudioPlayer></AudioPlayer>
-        </div>
-
-        <div className="flex-1"></div>
-      </div> */}
     </div>
   );
 };
@@ -171,5 +131,3 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 export default Dashboard;
-
-``;
