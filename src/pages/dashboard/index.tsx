@@ -9,18 +9,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { GetServerSidePropsContext } from "next";
-import { sendInterviewTimes } from "../../../mock/api/send_interview_times";
-import { InterviewTime } from "@/types";
+import {
+  InterviewTime,
+  sendInterviewTimes,
+} from "../../../mock/api/send_interview_times";
 import dynamic from "next/dynamic";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import EChart from "@/components/echarts";
-import * as echarts from "echarts";
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tabs } from "@radix-ui/react-tabs";
 import {
   OverallData,
   sendOverallData,
 } from "../../../mock/api/send_overall_data";
+import RadarChart from "@/components/radar-chart";
+import GaugeChart from "@/components/gauge-chart";
+import { Button } from "@/components/ui/button";
+import { ChevronRight } from "lucide-react";
 
 const Select = dynamic(
   () => import("@/components/ui/select").then((mod) => mod.Select),
@@ -29,16 +33,22 @@ const Select = dynamic(
   }
 );
 
+export const ScoreCriteria = {
+  algorithm: "Algorithm",
+  coding: "Coding",
+  communication: "Communication",
+  problemSolving: "Problem Solving",
+};
+
 const Dashboard = (props: {
   interviewTimes: InterviewTime[];
   overallData: OverallData;
 }) => {
   const { interviewTimes, overallData } = props;
   const [time, setTime] = useState<string>(interviewTimes[0].id);
-  console.log(interviewTimes);
 
   return (
-    <div className="mx-auto max-w-5xl grow px-4 pt-10">
+    <div className="mx-auto max-w-5xl grow px-4 pt-10 h-full w-full duration-300 ease-in-out animate-in fade-in slide-in-from-bottom-4">
       <div className="flex justify-between items-center">
         <h3 className="p-0 text-start text-3xl font-semibold text-purple-gradient">
           Welcome back, Harry!
@@ -68,78 +78,39 @@ const Dashboard = (props: {
       <Card className="mt-6">
         <CardContent className="p-6">
           <div className="flex gap-x-8">
-            <div className="flex-1">
-              <CardTitle className="text-xl w-1/2 pb-2">
-                Interview Performance
-              </CardTitle>
-              <p className="text-base text-neutral-500 pb-2">
-                Average Score:
-                <span className="px-1">
-                  {overallData.averageScore || "-"} / 4
-                </span>
-              </p>
-              <p className="text-base text-neutral-500 pb-2">
-                Interview Times:
-                <span className="px-1">
-                  {overallData.interviewTimes || "-"}
-                </span>
-              </p>
-              <p className="text-base text-neutral-500 pb-2">
-                Average Time Consumed:
-                <span className="px-1">
-                  {overallData.averageTimeConsumed || "-"} min
-                </span>
-              </p>
+            <div className="flex-1 flex flex-col justify-between">
+              <div>
+                <CardTitle className="text-xl w-1/2 pb-2">
+                  Interview Performance
+                </CardTitle>
+                <p className="text-lg text-neutral-500 pb-2">
+                  Average Score:
+                  <span className="px-1">
+                    {overallData.averageScore || "-"} / 4
+                  </span>
+                </p>
+                <p className="text-lg text-neutral-500 pb-2">
+                  Interview Times:
+                  <span className="px-1">
+                    {overallData.interviewTimes || "-"}
+                  </span>
+                </p>
+                <p className="text-lg text-neutral-500 pb-2">
+                  Average Time Consumed:
+                  <span className="px-1">
+                    {overallData.averageTimeConsumed || "-"} min
+                  </span>
+                </p>
+              </div>
+              <div>
+                <Button className="inline-flex items-center whitespace-nowrap font-medium shadow ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 group/cta text-md justify-start rounded-full">
+                  Check your interview details
+                  <ChevronRight className="lucide lucide-chevron-right ml-2 transition duration-200 group-hover/cta:translate-x-2" />
+                </Button>
+              </div>
             </div>
             <div className="flex-1">
-              <EChart
-                option={{
-                  tooltip: {
-                    trigger: "axis",
-                  },
-                  radar: {
-                    indicator: [
-                      { name: "Algorithm", max: 4 },
-                      { name: "Coding", max: 4 },
-                      { name: "Communication", max: 4 },
-                      { name: "Problem Solving", max: 4 },
-                    ],
-                  },
-                  series: [
-                    {
-                      name: "Interview Performance",
-                      type: "radar",
-                      tooltip: {
-                        trigger: "item",
-                      },
-                      data: [
-                        {
-                          value: Object.values(overallData.score),
-                          name: "Interview Performance",
-                          areaStyle: {
-                            color: new echarts.graphic.RadialGradient(
-                              0.1,
-                              0.6,
-                              1,
-                              [
-                                {
-                                  color: "rgba(255, 145, 124, 0.1)",
-                                  offset: 0,
-                                },
-                                {
-                                  color: "rgba(255, 145, 124, 0.9)",
-                                  offset: 1,
-                                },
-                              ]
-                            ),
-                          },
-                        },
-                      ],
-                    },
-                  ],
-                }}
-                style={{ width: "100%", height: 240 }}
-              />
+              <RadarChart value={Object.values(overallData.score)} />
             </div>
           </div>
         </CardContent>
@@ -151,68 +122,18 @@ const Dashboard = (props: {
             <TabsList className="grid grid-cols-4 w-[520px]">
               {Object.keys(overallData.score).map((item, index) => (
                 <TabsTrigger value={item} key={index}>
-                  {item}
+                  {ScoreCriteria[item as keyof typeof ScoreCriteria]}
                 </TabsTrigger>
               ))}
             </TabsList>
             {Object.keys(overallData.score).map((item, index) => {
-              console.log(item);
               return (
                 <TabsContent value={item} key={index}>
                   <div className="mt-2 flex gap-x-8">
                     <div className="flex-1">
-                      <EChart
-                        option={{
-                          series: [
-                            {
-                              title: {
-                                show: false,
-                              },
-                              name: item,
-                              type: "gauge",
-                              progress: {
-                                show: true,
-                                itemStyle: {
-                                  color: {
-                                    type: "linear",
-                                    x: 0,
-                                    y: 0,
-                                    x2: 0,
-                                    y2: 1,
-                                    colorStops: [
-                                      {
-                                        offset: 0,
-                                        color: "#f8adff",
-                                      },
-                                      {
-                                        offset: 1,
-                                        color: "#6b70ff",
-                                      },
-                                    ],
-                                    global: false,
-                                  },
-                                },
-                              },
-                              axisTick: {
-                                show: false,
-                              },
-                              min: 0,
-                              max: 4,
-                              detail: {
-                                valueAnimation: true,
-                                formatter: "{value}",
-                                offsetCenter: [0, "70%"],
-                              },
-                              data: [
-                                {
-                                  value: overallData.score[item],
-                                  name: "Score",
-                                },
-                              ],
-                            },
-                          ],
-                        }}
-                        style={{ width: "60%", height: 230 }}
+                      <GaugeChart
+                        name={ScoreCriteria[item as keyof typeof ScoreCriteria]}
+                        value={overallData.score[item]}
                       />
                     </div>
                     <div className="flex-1 flex justify-center items-center">
@@ -255,3 +176,5 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 export default Dashboard;
+
+``;
