@@ -1,5 +1,5 @@
 import * as echarts from "echarts";
-import EChart from "../echarts";
+import EChart from "../common/echarts";
 
 const RadarChart = (props: { value: number[] }) => {
   const { value } = props;

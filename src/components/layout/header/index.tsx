@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Avatar, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarImage } from "../../ui/avatar";
 import { UrlDirection } from "@/pages/_app";
-import Logo from "../../../public/logo";
+import Logo from "../../../../public/logo";
 
 const Header = (props: { changeUrl: (param: string) => void }) => {
   const { changeUrl } = props;

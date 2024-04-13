@@ -1,5 +1,5 @@
 import * as echarts from "echarts";
-import EChart from "../echarts";
+import EChart from "../common/echarts";
 
 const GaugeChart = (props: { name: string; value: number }) => {
   const { name, value } = props;

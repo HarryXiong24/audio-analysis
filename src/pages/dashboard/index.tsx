@@ -9,22 +9,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { GetServerSidePropsContext } from "next";
-import {
-  InterviewTime,
-  sendInterviewTimes,
-} from "../../../mock/api/send_interview_times";
 import dynamic from "next/dynamic";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tabs } from "@radix-ui/react-tabs";
-import {
-  OverallData,
-  sendOverallData,
-} from "../../../mock/api/send_overall_data";
 import RadarChart from "@/components/radar-chart";
 import GaugeChart from "@/components/gauge-chart";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
+import { InterviewTime, OverallData } from "@/types";
+import { getInterviewTimes } from "@/services/get-interview-times";
+import { getOverallData } from "@/services/get-overall-data";
 
 const Select = dynamic(
   () => import("@/components/ui/select").then((mod) => mod.Select),
@@ -164,8 +159,8 @@ const Dashboard = (props: {
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const interviewTimes: InterviewTime[] = await sendInterviewTimes();
-  const overallData: OverallData = await sendOverallData();
+  const interviewTimes: InterviewTime[] = await getInterviewTimes();
+  const overallData: OverallData = await getOverallData();
 
   return {
     props: {
