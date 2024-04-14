@@ -60,3 +60,9 @@ export interface DetailData {
     suggestion: string;
   };
 }
+
+export interface Code {
+  question: string;
+  language: string;
+  code: string;
+}

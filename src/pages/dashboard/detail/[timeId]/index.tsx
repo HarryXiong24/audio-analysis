@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getInterviewTimes } from "@/services/get-interview-times";
-import { DetailData, InterviewTime } from "@/types";
+import { Code, DetailData, InterviewTime } from "@/types";
 import { GetServerSidePropsContext } from "next";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
@@ -25,7 +25,8 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import ScoreChart from "@/components/score-chart";
-import Editor from "@monaco-editor/react";
+import CodeEditor from "@monaco-editor/react";
+import { getDetailCode } from "@/services/get-interview-code";
 
 const Select = dynamic(
   () => import("@/components/ui/select").then((mod) => mod.Select),
@@ -37,8 +38,9 @@ const Select = dynamic(
 const InterviewDetail = (props: {
   interviewTimes: InterviewTime[];
   detailData: DetailData;
+  codeData: Code;
 }) => {
-  const { interviewTimes, detailData } = props;
+  const { interviewTimes, detailData, codeData } = props;
   const [timeId, setTimeId] = useState<string>(interviewTimes[1].id);
   const [scoreTab, setScoreTab] = useState<string>("overall");
   const router = useRouter();
@@ -95,16 +97,41 @@ const InterviewDetail = (props: {
                     <TabsTrigger value="score">Score</TabsTrigger>
                   </TabsList>
                   <TabsContent value="code">
-                    <Editor
-                      className="mt-4 w-full"
-                      height="70vh"
-                      defaultLanguage="typescript"
-                      defaultValue=""
-                      theme="vs"
-                      options={{
-                        automaticLayout: true,
-                      }}
-                    />
+                    <ResizablePanelGroup
+                      direction="vertical"
+                      className="min-w-full min-h-[70vh] max-w-md"
+                    >
+                      <ResizablePanel defaultSize={75}>
+                        <div className="h-full">
+                          <CodeEditor
+                            className="mt-4 w-full"
+                            height="70vh"
+                            defaultLanguage={codeData.language}
+                            defaultValue={codeData.code}
+                            theme="vs"
+                            options={{
+                              automaticLayout: true,
+                            }}
+                          />
+                        </div>
+                      </ResizablePanel>
+                      <ResizableHandle />
+                      <ResizablePanel defaultSize={20}>
+                        <div className="h-full">
+                          <CodeEditor
+                            className="mt-4 w-full"
+                            height="70vh"
+                            defaultLanguage="text"
+                            defaultValue={codeData.question}
+                            theme="vs"
+                            options={{
+                              automaticLayout: true,
+                              readOnly: true,
+                            }}
+                          />
+                        </div>
+                      </ResizablePanel>
+                    </ResizablePanelGroup>
                   </TabsContent>
                   <TabsContent value="score">
                     <div className="float-right">
@@ -135,38 +162,39 @@ const InterviewDetail = (props: {
                       </Select>
                     </div>
                     <div>
-                      {Object.keys(detailData.score).map((item, index) => {
-                        if (item === scoreTab) {
-                          return (
-                            <div key={index}>
-                              <ScoreChart
-                                name={
-                                  ScoreCriteria[
-                                    item as keyof typeof ScoreCriteria
-                                  ]
-                                }
-                                value={detailData.score[item]}
-                                style={{
-                                  width: "50%",
-                                  height: 200,
-                                }}
-                              />
-                              <div>
-                                <h3 className="text-xl mb-4">AI Review</h3>
-                                <p className="text-base text-neutral-500 ">
-                                  {
-                                    (
-                                      detailData[
-                                        item as keyof typeof detailData
-                                      ] as any
-                                    ).suggestion
+                      {detailData.score &&
+                        Object.keys(detailData.score)?.map((item, index) => {
+                          if (item === scoreTab) {
+                            return (
+                              <div key={index}>
+                                <ScoreChart
+                                  name={
+                                    ScoreCriteria[
+                                      item as keyof typeof ScoreCriteria
+                                    ]
                                   }
-                                </p>
+                                  value={detailData.score[item]}
+                                  style={{
+                                    width: "50%",
+                                    height: 200,
+                                  }}
+                                />
+                                <div>
+                                  <h3 className="text-xl mb-4">AI Review</h3>
+                                  <p className="text-base text-neutral-500 ">
+                                    {
+                                      (
+                                        detailData[
+                                          item as keyof typeof detailData
+                                        ] as any
+                                      ).suggestion
+                                    }
+                                  </p>
+                                </div>
                               </div>
-                            </div>
-                          );
-                        }
-                      })}
+                            );
+                          }
+                        })}
                     </div>
                   </TabsContent>
                 </Tabs>
@@ -185,11 +213,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const interviewTimes: InterviewTime[] = await getInterviewTimes();
   const detailData: DetailData = await getDetailData(params!.timeId as string);
+  const codeData: Code = await getDetailCode(params!.timeId as string);
 
   return {
     props: {
       interviewTimes: interviewTimes,
       detailData: detailData,
+      codeData: codeData,
     },
   };
 }

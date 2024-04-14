@@ -1,29 +1,32 @@
-import { useRef, useState, useEffect } from "react";
-import * as monaco from "monaco-editor";
+import React, { useRef, useEffect } from "react";
+import Editor, { useMonaco } from "@monaco-editor/react";
 
-const Editor = () => {
-  const [editor, setEditor] =
-    useState<monaco.editor.IStandaloneCodeEditor | null>(null);
-  const monacoEl = useRef(null);
+const CodeEditor = (props: { language: string; defaultValue: string }) => {
+  const { language, defaultValue } = props;
+  const monacoRef = useMonaco();
+  const editorRef = useRef(null);
 
   useEffect(() => {
-    if (monacoEl) {
-      setEditor((editor) => {
-        if (editor) return editor;
-
-        return monaco.editor.create(monacoEl.current!, {
-          value: ["function x() {", '\tconsole.log("Hello world!");', "}"].join(
-            "\n"
-          ),
-          language: "typescript",
-        });
-      });
+    if (editorRef.current && monacoRef) {
+      editorRef.current.setValue(defaultValue);
+      monacoRef.editor.getAction("editor.action.formatDocument").run();
     }
+  }, [defaultValue, monacoRef]);
 
-    return () => editor?.dispose();
-  }, [monacoEl.current]);
-
-  return <div ref={monacoEl}></div>;
+  return (
+    <Editor
+      height="90vh"
+      defaultLanguage={language || "javascript"}
+      theme="vs-dark"
+      options={{
+        automaticLayout: true,
+      }}
+      onMount={(editor) => {
+        editorRef.current = editor;
+        editor.setValue(defaultValue);
+      }}
+    />
+  );
 };
 
-export default Editor;
+export default CodeEditor;
