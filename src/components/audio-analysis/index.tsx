@@ -95,7 +95,7 @@ const AudioAnalysis = () => {
   const duration = wavesurfer && wavesurfer.getDuration();
 
   return (
-    <Card className="overflow-x-hidden h-full">
+    <Card className="overflow-x-hidden min-h-[82vh]">
       <CardHeader>
         <CardTitle>Interview audio playback</CardTitle>
         <CardDescription className="text-base text-neutral-500">

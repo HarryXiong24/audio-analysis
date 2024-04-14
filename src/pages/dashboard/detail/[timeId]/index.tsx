@@ -16,17 +16,16 @@ import { useState } from "react";
 import AudioAnalysis from "@/components/audio-analysis";
 import Footer from "@/components/layout/footer";
 import { getDetailData } from "@/services/get-interview-detail";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScoreCriteria } from "../..";
-import GaugeChart from "@/components/gauge-chart";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import ScoreChart from "@/components/score-chart";
-import { isArray } from "util";
+import Editor from "@monaco-editor/react";
 
 const Select = dynamic(
   () => import("@/components/ui/select").then((mod) => mod.Select),
@@ -88,7 +87,7 @@ const InterviewDetail = (props: {
           </ResizablePanel>
           <ResizableHandle className="mx-1" />
           <ResizablePanel className="h-full">
-            <Card className="h-full">
+            <Card className="min-h-[82vh]">
               <CardContent className="p-6">
                 <Tabs defaultValue="code" className="w-full">
                   <TabsList className="grid grid-cols-2 w-1/3">
@@ -96,7 +95,16 @@ const InterviewDetail = (props: {
                     <TabsTrigger value="score">Score</TabsTrigger>
                   </TabsList>
                   <TabsContent value="code">
-                    Make changes to your account here.
+                    <Editor
+                      className="mt-4 w-full"
+                      height="70vh"
+                      defaultLanguage="typescript"
+                      defaultValue=""
+                      theme="vs"
+                      options={{
+                        automaticLayout: true,
+                      }}
+                    />
                   </TabsContent>
                   <TabsContent value="score">
                     <div className="float-right">
