@@ -102,10 +102,12 @@ const Dashboard = (props: {
         <Card className="mt-6">
           <CardContent className="p-6">
             <Tabs defaultValue="overall">
-              <TabsList className="grid grid-cols-5 w-[620px]">
+              <TabsList className="grid grid-cols-5  w-4/5">
                 {Object.keys(overallData.score).map((item, index) => (
                   <TabsTrigger value={item} key={index}>
-                    {ScoreCriteria[item as keyof typeof ScoreCriteria]}
+                    <p className="overflow-x-hidden">
+                      {ScoreCriteria[item as keyof typeof ScoreCriteria]}
+                    </p>
                   </TabsTrigger>
                 ))}
               </TabsList>

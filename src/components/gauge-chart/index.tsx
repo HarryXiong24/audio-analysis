@@ -1,4 +1,3 @@
-import * as echarts from "echarts";
 import EChart from "../common/echarts";
 import { CSSProperties } from "react";
 

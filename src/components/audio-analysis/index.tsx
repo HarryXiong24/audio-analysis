@@ -22,23 +22,22 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuRadioGroup,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import { DropdownMenuRadioItem } from "../ui/dropdown-menu";
 import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js";
 import Hover from "wavesurfer.js/dist/plugins/hover.esm.js";
 import Minimap from "wavesurfer.js/dist/plugins/minimap.esm.js";
+import { Slider } from "../ui/slider";
 
-const AudioPlayer = () => {
+const AudioAnalysis = () => {
   const audioRef = useRef(null);
-  const [speed, setSpeed] = useState("1");
+  const [speed, setSpeed] = useState(1);
 
   const { wavesurfer, isPlaying, currentTime } = useWavesurfer({
     container: audioRef,
-    width: "40vw",
+    width: "100%",
     height: 120,
     waveColor: "rgb(200, 0, 200)",
     progressColor: "rgb(100, 0, 100)",
@@ -54,9 +53,7 @@ const AudioPlayer = () => {
         return [
           Timeline.create(),
           ZoomPlugin.create({
-            // the amount of zoom per wheel step, e.g. 0.5 means a 50% magnification per scroll
             scale: 0.5,
-            // Optionally, specify the maximum pixels-per-second factor while zooming
             maxZoom: 100,
           }),
           Hover.create({
@@ -89,8 +86,8 @@ const AudioPlayer = () => {
   }, [wavesurfer]);
 
   const onSpeedChange = useCallback(
-    (value: string) => {
-      wavesurfer && wavesurfer.setPlaybackRate(parseFloat(value), true);
+    (value: number) => {
+      wavesurfer && wavesurfer.setPlaybackRate(value, true);
     },
     [wavesurfer]
   );
@@ -98,7 +95,7 @@ const AudioPlayer = () => {
   const duration = wavesurfer && wavesurfer.getDuration();
 
   return (
-    <Card>
+    <Card className="overflow-x-hidden h-full">
       <CardHeader>
         <CardTitle>Interview audio playback</CardTitle>
         <CardDescription className="text-base text-neutral-500">
@@ -135,36 +132,21 @@ const AudioPlayer = () => {
             <FastForward />
           </Button>
         </div>
-        <div className="text-base text-neutral-500 text-center">
+        <div className="text-base text-neutral-500 text-left">
           {formatTime(currentTime)} / {formatTime(duration)}
         </div>
-        <div className="flex justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild className="mr-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-lg text-neutral-500"
-              >
-                {speed}x
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white border rounded z-1000 ">
-              <DropdownMenuRadioGroup
-                value={speed}
-                onValueChange={(value) => {
-                  onSpeedChange(value);
-                  setSpeed(value);
-                }}
-                className="p-2"
-              >
-                <DropdownMenuRadioItem value="0.5">0.5</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="1">1</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="1.5">1.5</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="2">2</DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="flex justify-end items-center">
+          <Slider
+            defaultValue={[1]}
+            min={0}
+            max={4}
+            step={0.1}
+            onValueChange={(value) => {
+              onSpeedChange(value[0]);
+              setSpeed(value[0]);
+            }}
+          />
+          <span className="text-lg text-neutral-500 mx-2">{speed}x</span>
           <Button
             variant="ghost"
             size="icon"
@@ -187,4 +169,4 @@ const AudioPlayer = () => {
   );
 };
 
-export default AudioPlayer;
+export default AudioAnalysis;
