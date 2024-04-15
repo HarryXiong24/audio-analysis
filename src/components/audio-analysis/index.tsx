@@ -26,6 +26,7 @@ import Minimap from "wavesurfer.js/dist/plugins/minimap.esm.js";
 import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js";
 import { Checkbox } from "../ui/checkbox";
 import { AudioSuggestion } from "@/types";
+import AISuggestion from "../ai-suggestion";
 
 const AudioAnalysis = (props: {
   timeId: string;
@@ -36,6 +37,7 @@ const AudioAnalysis = (props: {
   const [speed, setSpeed] = useState(1);
   const [loop, setLoop] = useState(false);
   const activeRegion = useRef<any>(null);
+  const currentRegionId = useRef<string | null>(null);
   const loopRef = useRef(true);
 
   const { wavesurfer, isPlaying, currentTime } = useWavesurfer({
@@ -112,7 +114,7 @@ const AudioAnalysis = (props: {
             end: audioSuggestions[i].end,
             color: "#4adfc080",
             drag: false,
-            resize: true,
+            resize: false,
           });
         }
       });
@@ -122,6 +124,7 @@ const AudioAnalysis = (props: {
     wsRegions &&
       wsRegions.on("region-in", (region: any) => {
         activeRegion.current = region;
+        currentRegionId.current = region.id;
       });
     wsRegions &&
       wsRegions.on("region-out", (region: any) => {
@@ -130,6 +133,7 @@ const AudioAnalysis = (props: {
             region.play();
           } else {
             activeRegion.current = null;
+            currentRegionId.current = null;
           }
         }
       });
@@ -137,6 +141,7 @@ const AudioAnalysis = (props: {
       wsRegions.on("region-clicked", (region, e) => {
         e.stopPropagation(); // prevent triggering a click on the waveform
         activeRegion.current = region;
+        currentRegionId.current = region.id;
         region.play();
         region.setOptions({ color: "rgba(195, 228, 110, 0.5)" } as any);
       });
@@ -144,6 +149,7 @@ const AudioAnalysis = (props: {
     wavesurfer &&
       wavesurfer.on("interaction", () => {
         activeRegion.current = null;
+        currentRegionId.current = null;
       });
   }, [wavesurfer, wsRegions]);
 
@@ -168,90 +174,98 @@ const AudioAnalysis = (props: {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div ref={audioRef}></div>
-      </CardContent>
-      <CardFooter className="flex items-center">
-        <div className="flex-1">
-          <Button
-            onClick={onRewind}
-            variant="ghost"
-            size="icon"
-            className="text-base text-neutral-500 mr-2"
-          >
-            <Rewind />
-          </Button>
-          <Button
-            onClick={onPlayPause}
-            variant="ghost"
-            size="icon"
-            className="text-base text-neutral-500 mr-2"
-          >
-            {isPlaying ? <Pause /> : <Play />}
-          </Button>
-          <Button
-            onClick={onFastForward}
-            variant="ghost"
-            size="icon"
-            className="text-base text-neutral-500 mr-2"
-          >
-            <FastForward />
-          </Button>
-        </div>
-        <div className="flex-1 text-base text-neutral-500 text-left">
-          {formatTime(currentTime)} / {formatTime(duration)}
-        </div>
-        <div className="flex-3 flex justify-end items-center">
-          <Slider
-            className="w-24"
-            defaultValue={[1]}
-            min={0}
-            max={4}
-            step={0.1}
-            onValueChange={(value) => {
-              onSpeedChange(value[0]);
-              setSpeed(value[0]);
-            }}
-          />
-          <span className="text-lg text-neutral-500 mx-2">{speed}x</span>
-          <div className="flex items-center space-x-2 mx-2">
-            <Checkbox
-              id="terms"
-              checked={loop}
-              onCheckedChange={(checked: boolean) => {
-                setLoop(checked);
-              }}
-            />
-            <label
-              htmlFor="terms"
-              className="text-sm text-neutral-500 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Loop AI Suggestion
-            </label>
+        <div className="mb-4">
+          <div ref={audioRef}></div>
+          <div className="flex items-center mt-4">
+            <div className="flex-1">
+              <Button
+                onClick={onRewind}
+                variant="ghost"
+                size="icon"
+                className="text-base text-neutral-500 mr-2"
+              >
+                <Rewind />
+              </Button>
+              <Button
+                onClick={onPlayPause}
+                variant="ghost"
+                size="icon"
+                className="text-base text-neutral-500 mr-2"
+              >
+                {isPlaying ? <Pause /> : <Play />}
+              </Button>
+              <Button
+                onClick={onFastForward}
+                variant="ghost"
+                size="icon"
+                className="text-base text-neutral-500 mr-2"
+              >
+                <FastForward />
+              </Button>
+            </div>
+            <div className="flex-1 text-base text-neutral-500 text-left">
+              {formatTime(currentTime)} / {formatTime(duration)}
+            </div>
+            <div className="flex-3 flex justify-end items-center">
+              <Slider
+                className="w-24"
+                defaultValue={[1]}
+                min={0}
+                max={4}
+                step={0.1}
+                onValueChange={(value) => {
+                  onSpeedChange(value[0]);
+                  setSpeed(value[0]);
+                }}
+              />
+              <span className="text-lg text-neutral-500 mx-2">{speed}x</span>
+              <div className="flex items-center space-x-2 mx-2">
+                <Checkbox
+                  id="terms"
+                  checked={loop}
+                  onCheckedChange={(checked: boolean) => {
+                    setLoop(checked);
+                  }}
+                />
+                <label
+                  htmlFor="terms"
+                  className="text-sm text-neutral-500 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Loop AI Suggestion
+                </label>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-base text-neutral-500"
+                onClick={async () => {
+                  try {
+                    const response = await fetch("/api/download-audio", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({ timeId: timeId }),
+                    });
+                    const blob = await response.blob();
+                    saveAs(blob, "demo.wav");
+                  } catch (e) {
+                    console.log(e);
+                  }
+                }}
+              >
+                <ArrowDownToLine />
+              </Button>
+            </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-base text-neutral-500"
-            onClick={async () => {
-              try {
-                const response = await fetch("/api/download-audio", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({ timeId: timeId }),
-                });
-                const blob = await response.blob();
-                saveAs(blob, "demo.wav");
-              } catch (e) {
-                console.log(e);
-              }
-            }}
-          >
-            <ArrowDownToLine />
-          </Button>
         </div>
-      </CardFooter>
+        <div>
+          <AISuggestion
+            audioSuggestions={audioSuggestions}
+            currentRegionId={currentRegionId.current}
+          ></AISuggestion>
+        </div>
+      </CardContent>
     </Card>
   );
 };

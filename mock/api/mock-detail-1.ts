@@ -102,9 +102,30 @@ export const MockDetailAudioSuggestions = [
   },
   {
     id: "3",
-    start: 60,
-    end: 130,
+    start: 80,
+    end: 120,
     suggestion:
       "When preparing for an interview, it's important to thoroughly research the company and the role you are applying for, ensuring that you understand their mission, culture, and the specific responsibilities associated with the position, while also practicing your responses to common interview questions and scenarios, but remember to remain flexible and ready to engage in a conversation rather than delivering rehearsed responses, and it’s equally crucial to prepare some insightful questions to ask the interviewer, as this demonstrates your genuine interest in the position and helps you determine if the company’s environment and values align with your professional goals.",
+  },
+  {
+    id: "4",
+    start: 150,
+    end: 180,
+    suggestion:
+      "test suggestion, test suggestion, test suggestion, test suggestion",
+  },
+  {
+    id: "5",
+    start: 220,
+    end: 240,
+    suggestion:
+      "CCCCCCC test suggestion, test suggestion, test suggestion, test suggestion",
+  },
+  {
+    id: "6",
+    start: 260,
+    end: 280,
+    suggestion:
+      "Sdghsdgsgadisytd CCCCCCC test suggestion, test suggestion, test suggestion, test suggestion",
   },
 ];

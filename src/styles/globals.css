@@ -100,3 +100,123 @@ body {
     opacity: 0;
   }
 }
+
+.waveform {
+  display: flex;
+  align-items: center;
+  height: 60px; /* 调整波形动画的容器高度 */
+}
+
+.bar {
+  width: 6px;
+  height: 16px;
+  background-color: #6b70ff;
+  border-radius: 6px;
+  margin: 0 2px;
+  animation: wave 1s ease-in-out infinite;
+}
+
+/* 关键帧动画 */
+@keyframes wave {
+  0%,
+  100% {
+    height: 20px; /* 初始和结束条形的高度 */
+    opacity: 0.5;
+  }
+  50% {
+    height: 60px; /* 波峰的最大高度 */
+    opacity: 1;
+  }
+}
+
+/* 为每个条形添加不同的动画延迟以创建波形效果 */
+.bar:nth-child(1) {
+  animation-delay: 0s;
+}
+.bar:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.bar:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.bar:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.bar:nth-child(5) {
+  animation-delay: 0.4s;
+}
+.bar:nth-child(6) {
+  animation-delay: 0.5s;
+}
+.bar:nth-child(7) {
+  animation-delay: 0.6s;
+}
+.bar:nth-child(8) {
+  animation-delay: 0.7s;
+}
+.bar:nth-child(9) {
+  animation-delay: 0.8s;
+}
+.bar:nth-child(10) {
+  animation-delay: 0.9s;
+}
+.bar:nth-child(11) {
+  animation-delay: 1s;
+}
+.bar:nth-child(12) {
+  animation-delay: 1.1s;
+}
+.bar:nth-child(13) {
+  animation-delay: 1.2s;
+}
+.bar:nth-child(14) {
+  animation-delay: 1.3s;
+}
+.bar:nth-child(15) {
+  animation-delay: 1.4s;
+}
+.bar:nth-child(16) {
+  animation-delay: 1.5s;
+}
+.bar:nth-child(17) {
+  animation-delay: 1.6s;
+}
+.bar:nth-child(18) {
+  animation-delay: 1.7s;
+}
+.bar:nth-child(19) {
+  animation-delay: 1.8s;
+}
+.bar:nth-child(20) {
+  animation-delay: 1.9s;
+}
+.bar:nth-child(21) {
+  animation-delay: 2s;
+}
+.bar:nth-child(22) {
+  animation-delay: 2.1s;
+}
+.bar:nth-child(23) {
+  animation-delay: 2.2s;
+}
+.bar:nth-child(24) {
+  animation-delay: 2.3s;
+}
+.bar:nth-child(25) {
+  animation-delay: 2.4s;
+}
+.bar:nth-child(26) {
+  animation-delay: 2.5s;
+}
+.bar:nth-child(27) {
+  animation-delay: 2.6s;
+}
+.bar:nth-child(28) {
+  animation-delay: 2.7s;
+}
+.bar:nth-child(29) {
+  animation-delay: 2.8s;
+}
+.bar:nth-child(30) {
+  animation-delay: 2.9s;
+}
