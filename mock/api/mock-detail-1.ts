@@ -84,3 +84,27 @@ Explanation: The arrays we are merging are [] and [1]. The result of the merge i
   }
 }`,
 };
+
+export const MockDetailAudioSuggestions = [
+  {
+    id: "1",
+    start: 5,
+    end: 13,
+    suggestion:
+      "The candidate need to improve the communication skill, and the problem-solving skill, and the coding skill.",
+  },
+  {
+    id: "2",
+    start: 20,
+    end: 50,
+    suggestion:
+      "When preparing for an interview, it's important to thoroughly research the company and the role you are applying for, ensuring that you understand their mission, culture, and the specific responsibilities associated with the position, while also practicing your responses to common interview questions and scenarios, but remember to remain flexible and ready to engage in a conversation rather than delivering rehearsed responses, and it’s equally crucial to prepare some insightful questions to ask the interviewer, as this demonstrates your genuine interest in the position and helps you determine if the company’s environment and values align with your professional goals.",
+  },
+  {
+    id: "3",
+    start: 60,
+    end: 130,
+    suggestion:
+      "When preparing for an interview, it's important to thoroughly research the company and the role you are applying for, ensuring that you understand their mission, culture, and the specific responsibilities associated with the position, while also practicing your responses to common interview questions and scenarios, but remember to remain flexible and ready to engage in a conversation rather than delivering rehearsed responses, and it’s equally crucial to prepare some insightful questions to ask the interviewer, as this demonstrates your genuine interest in the position and helps you determine if the company’s environment and values align with your professional goals.",
+  },
+];

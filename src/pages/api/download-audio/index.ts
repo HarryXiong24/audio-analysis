@@ -3,23 +3,49 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import fs from "fs";
 import path from "path";
 
-type Data = {
-  name: string;
-};
+function handleParams(timeId: string) {
+  if (timeId === "1") {
+    return path.resolve("./mock/audio", "demo1.wav");
+  } else {
+    return null;
+  }
+}
 
-export default function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
-  const filePath = path.resolve("./mock/audio", "demo.wav");
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === "POST") {
+    const { timeId } = req.body;
 
-  const stat = fs.statSync(filePath);
-  const fileSize = stat.size;
+    if (!timeId) {
+      res.status(400).json({ error: "timeId is required" } as any);
+      return;
+    }
 
-  res.setHeader("Content-Type", "audio/wav");
-  res.setHeader("Content-Length", fileSize);
-  res.setHeader("Content-Disposition", "attachment; filename=demo.wav");
+    const filePath = handleParams(timeId);
 
-  const readStream = fs.createReadStream(filePath);
-  readStream.pipe(res);
+    if (!filePath) {
+      res.status(404).json({ error: "timeId is not exist" });
+      return;
+    }
+
+    if (!fs.existsSync(filePath)) {
+      res.status(404).json({ error: "File not found" });
+      return;
+    }
+
+    const stat = fs.statSync(filePath);
+    const fileSize = stat.size;
+
+    console.log("fileSize", fileSize);
+
+    res.setHeader("Content-Type", "audio/wav");
+    res.setHeader("Content-Length", fileSize.toString());
+    res.setHeader("Content-Disposition", "attachment; filename=demo.wav");
+
+    const readStream = fs.createReadStream(filePath);
+    readStream.pipe(res);
+    res.status(200);
+  } else {
+    res.setHeader("Allow", ["POST"]);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
 }

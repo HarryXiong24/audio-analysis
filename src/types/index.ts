@@ -66,3 +66,10 @@ export interface Code {
   language: string;
   code: string;
 }
+
+export interface AudioSuggestion {
+  id: string;
+  start: number;
+  end: number;
+  suggestion: string;
+}

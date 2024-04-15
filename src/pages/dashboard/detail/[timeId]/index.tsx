@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getInterviewTimes } from "@/services/get-interview-times";
-import { Code, DetailData, InterviewTime } from "@/types";
+import { AudioSuggestion, Code, DetailData, InterviewTime } from "@/types";
 import { GetServerSidePropsContext } from "next";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
@@ -28,6 +28,7 @@ import ScoreChart from "@/components/score-chart";
 import CodeEditor from "@monaco-editor/react";
 import { getDetailCode } from "@/services/get-interview-code";
 import Link from "next/link";
+import { getInterviewSuggestions } from "@/services/get-audio-suggestions";
 
 const Select = dynamic(
   () => import("@/components/ui/select").then((mod) => mod.Select),
@@ -40,10 +41,12 @@ const InterviewDetail = (props: {
   interviewTimes: InterviewTime[];
   initDetailData: DetailData;
   initCodeData: Code;
+  audioSuggestions: AudioSuggestion[];
 }) => {
   const router = useRouter();
   const id = router.query.timeId as string;
-  const { interviewTimes, initDetailData, initCodeData } = props;
+  const { interviewTimes, initDetailData, initCodeData, audioSuggestions } =
+    props;
   const [timeId, setTimeId] = useState<string>(id ? id : interviewTimes[1].id);
   const [scoreTab, setScoreTab] = useState<string>("overall");
   const [detailData, setDetailData] = useState<DetailData>(initDetailData);
@@ -105,7 +108,10 @@ const InterviewDetail = (props: {
         </div>
         <ResizablePanelGroup direction="horizontal" className="h-full">
           <ResizablePanel className="h-full">
-            <AudioAnalysis></AudioAnalysis>
+            <AudioAnalysis
+              timeId={timeId}
+              audioSuggestions={audioSuggestions}
+            ></AudioAnalysis>
           </ResizablePanel>
           <ResizableHandle className="mx-1" />
           <ResizablePanel className="h-full">
@@ -139,6 +145,9 @@ const InterviewDetail = (props: {
                       <ResizableHandle />
                       <ResizablePanel defaultSize={20}>
                         <div className="h-full">
+                          <p className="pt-4 pl-4 text-xl font-semibold leading-none tracking-tight">
+                            Question
+                          </p>
                           <CodeEditor
                             key={interviewTimes[0].id}
                             className="mt-4 w-full"
@@ -238,12 +247,16 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     params!.timeId as string
   );
   const initCodeData: Code = await getDetailCode(params!.timeId as string);
+  const audioSuggestions = await getInterviewSuggestions(
+    params!.timeId as string
+  );
 
   return {
     props: {
       interviewTimes: interviewTimes,
       initDetailData: initDetailData,
       initCodeData: initCodeData,
+      audioSuggestions: audioSuggestions,
     },
   };
 }

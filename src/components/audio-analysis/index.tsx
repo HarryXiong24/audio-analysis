@@ -1,12 +1,4 @@
-import {
-  use,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWavesurfer } from "@wavesurfer/react";
 import { formatTime } from "@/lib/format-time";
 import { Button } from "@/components/ui/button";
@@ -33,8 +25,13 @@ import Hover from "wavesurfer.js/dist/plugins/hover.esm.js";
 import Minimap from "wavesurfer.js/dist/plugins/minimap.esm.js";
 import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js";
 import { Checkbox } from "../ui/checkbox";
+import { AudioSuggestion } from "@/types";
 
-const AudioAnalysis = () => {
+const AudioAnalysis = (props: {
+  timeId: string;
+  audioSuggestions: AudioSuggestion[];
+}) => {
+  const { timeId, audioSuggestions } = props;
   const audioRef = useRef(null);
   const [speed, setSpeed] = useState(1);
   const [loop, setLoop] = useState(false);
@@ -47,11 +44,11 @@ const AudioAnalysis = () => {
     height: 120,
     waveColor: "rgb(200, 0, 200)",
     progressColor: "rgb(100, 0, 100)",
-    url: "/api/get-audio",
+    url: `/api/get-audio?timeId=${timeId}`,
     fillParent: true,
     interact: true,
     dragToSeek: true,
-    minPxPerSec: 10,
+    minPxPerSec: 1,
     autoCenter: true,
     audioRate: 1,
     plugins: useMemo(() => {
@@ -107,39 +104,27 @@ const AudioAnalysis = () => {
     // Create some regions at specific time ranges
     wavesurfer &&
       wavesurfer.on("decode", () => {
-        // Regions
-        wsRegions!.addRegion({
-          id: "1",
-          start: 0,
-          end: 8,
-          color: "rgba(74, 223, 192, 0.5)",
-          drag: false,
-          resize: true,
-        });
-        wsRegions!.addRegion({
-          id: "2",
-          start: 9,
-          end: 16,
-          color: "rgba(74, 223, 192, 0.5)",
-          drag: false,
-          resize: true,
-        });
+        for (let i = 0; i < audioSuggestions.length; i++) {
+          // Regions
+          wsRegions!.addRegion({
+            id: audioSuggestions[i].id,
+            start: audioSuggestions[i].start,
+            end: audioSuggestions[i].end,
+            color: "#4adfc080",
+            drag: false,
+            resize: true,
+          });
+        }
       });
-  }, [wavesurfer, wsRegions]);
+  }, [audioSuggestions, wavesurfer, wsRegions]);
 
-  const updateRegion = () => {
+  const updateRegion = useCallback(() => {
     wsRegions &&
       wsRegions.on("region-in", (region: any) => {
-        console.log("region-in", region);
-        console.log("isLoop", loopRef.current);
-        console.log("activeRegion", activeRegion.current);
         activeRegion.current = region;
       });
     wsRegions &&
       wsRegions.on("region-out", (region: any) => {
-        console.log("region-out", region);
-        console.log("isLoop", loopRef.current);
-        console.log("activeRegion === region", activeRegion.current === region);
         if (activeRegion.current === region) {
           if (loopRef.current) {
             region.play();
@@ -160,13 +145,13 @@ const AudioAnalysis = () => {
       wavesurfer.on("interaction", () => {
         activeRegion.current = null;
       });
-  };
+  }, [wavesurfer, wsRegions]);
 
   useEffect(() => {
-    createRegion();
     loopRef.current = loop;
+    createRegion();
     updateRegion();
-  }, [loop, createRegion]);
+  }, [loop, createRegion, updateRegion]);
 
   return (
     <Card className="overflow-x-hidden min-h-[82vh]">
@@ -249,7 +234,13 @@ const AudioAnalysis = () => {
             className="text-base text-neutral-500"
             onClick={async () => {
               try {
-                const response = await fetch("/api/download-audio");
+                const response = await fetch("/api/download-audio", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ timeId: timeId }),
+                });
                 const blob = await response.blob();
                 saveAs(blob, "demo.wav");
               } catch (e) {
