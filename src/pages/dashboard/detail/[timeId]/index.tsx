@@ -11,7 +11,7 @@ import { getInterviewTimes } from "@/services/get-interview-times";
 import { Code, DetailData, InterviewTime } from "@/types";
 import { GetServerSidePropsContext } from "next";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import AudioAnalysis from "@/components/audio-analysis";
 import Footer from "@/components/layout/footer";
@@ -27,6 +27,7 @@ import {
 import ScoreChart from "@/components/score-chart";
 import CodeEditor from "@monaco-editor/react";
 import { getDetailCode } from "@/services/get-interview-code";
+import Link from "next/link";
 
 const Select = dynamic(
   () => import("@/components/ui/select").then((mod) => mod.Select),
@@ -37,13 +38,28 @@ const Select = dynamic(
 
 const InterviewDetail = (props: {
   interviewTimes: InterviewTime[];
-  detailData: DetailData;
-  codeData: Code;
+  initDetailData: DetailData;
+  initCodeData: Code;
 }) => {
-  const { interviewTimes, detailData, codeData } = props;
-  const [timeId, setTimeId] = useState<string>(interviewTimes[1].id);
-  const [scoreTab, setScoreTab] = useState<string>("overall");
   const router = useRouter();
+  const id = router.query.timeId as string;
+  const { interviewTimes, initDetailData, initCodeData } = props;
+  const [timeId, setTimeId] = useState<string>(id ? id : interviewTimes[1].id);
+  const [scoreTab, setScoreTab] = useState<string>("overall");
+  const [detailData, setDetailData] = useState<DetailData>(initDetailData);
+  const [codeData, setCodeData] = useState<Code>(initCodeData);
+
+  const fetchDetailData = async (timeId: string) => {
+    const data = await getDetailData(timeId);
+    console.log(data);
+    setDetailData(data || {});
+  };
+
+  const fetchCodeData = async (timeId: string) => {
+    const data = await getDetailCode(timeId);
+    console.log(data);
+    setCodeData(data || {});
+  };
 
   return (
     <>
@@ -63,6 +79,8 @@ const InterviewDetail = (props: {
                   router.push("/dashboard");
                 } else {
                   router.push(`/dashboard/detail/${timeId}`);
+                  fetchDetailData(timeId);
+                  fetchCodeData(timeId);
                 }
               }}
             >
@@ -75,7 +93,9 @@ const InterviewDetail = (props: {
                   <DropdownMenuSeparator />
                   {interviewTimes?.map((item, index) => (
                     <SelectItem value={item.id} key={index}>
-                      {item.time}
+                      <Link href={`/dashboard/detail/${item.id}`}>
+                        {item.time}
+                      </Link>
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -104,10 +124,11 @@ const InterviewDetail = (props: {
                       <ResizablePanel defaultSize={75}>
                         <div className="h-full">
                           <CodeEditor
+                            key={interviewTimes[0].id}
                             className="mt-4 w-full"
                             height="70vh"
-                            defaultLanguage={codeData.language}
-                            defaultValue={codeData.code}
+                            language={codeData.language || "text"}
+                            value={codeData.code || ""}
                             theme="vs"
                             options={{
                               automaticLayout: true,
@@ -119,10 +140,11 @@ const InterviewDetail = (props: {
                       <ResizablePanel defaultSize={20}>
                         <div className="h-full">
                           <CodeEditor
+                            key={interviewTimes[0].id}
                             className="mt-4 w-full"
                             height="70vh"
                             defaultLanguage="text"
-                            defaultValue={codeData.question}
+                            value={codeData.question || ""}
                             theme="vs"
                             options={{
                               automaticLayout: true,
@@ -212,14 +234,16 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { params } = context;
 
   const interviewTimes: InterviewTime[] = await getInterviewTimes();
-  const detailData: DetailData = await getDetailData(params!.timeId as string);
-  const codeData: Code = await getDetailCode(params!.timeId as string);
+  const initDetailData: DetailData = await getDetailData(
+    params!.timeId as string
+  );
+  const initCodeData: Code = await getDetailCode(params!.timeId as string);
 
   return {
     props: {
       interviewTimes: interviewTimes,
-      detailData: detailData,
-      codeData: codeData,
+      initDetailData: initDetailData,
+      initCodeData: initCodeData,
     },
   };
 }
