@@ -21,8 +21,8 @@ const AISuggestion = (props: {
             </p>
           ))
         ) : (
-          <div className="flex justify-center">
-            <div className="waveform my-2">
+          <div className="flex justify-start">
+            <div className="waveform my-4">
               <div className="bar"></div>
               <div className="bar"></div>
               <div className="bar"></div>

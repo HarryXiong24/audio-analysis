@@ -6,6 +6,8 @@ import path from "path";
 function handleParams(timeId: string) {
   if (timeId === "1") {
     return path.resolve("./mock/audio", "demo1.wav");
+  } else if (timeId === "2") {
+    return path.resolve("./mock/audio", "demo2.wav");
   } else {
     return null;
   }

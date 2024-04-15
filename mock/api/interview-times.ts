@@ -9,6 +9,6 @@ export const MockInterviewTimes = [
   },
   {
     id: "2",
-    time: "4/10/2024 11:00:00 AM",
+    time: "3/10/2024 11:00:00 AM",
   },
 ];

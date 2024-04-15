@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWavesurfer } from "@wavesurfer/react";
 import { formatTime } from "@/lib/format-time";
 import { Button } from "@/components/ui/button";
@@ -106,6 +106,8 @@ const AudioAnalysis = (props: {
     // Create some regions at specific time ranges
     wavesurfer &&
       wavesurfer.on("decode", () => {
+        console.log("audioSuggestions", audioSuggestions);
+        wsRegions && wsRegions.clearRegions();
         for (let i = 0; i < audioSuggestions.length; i++) {
           // Regions
           wsRegions!.addRegion({
@@ -157,7 +159,7 @@ const AudioAnalysis = (props: {
     loopRef.current = loop;
     createRegion();
     updateRegion();
-  }, [loop, createRegion, updateRegion]);
+  }, [loop, createRegion, updateRegion, wavesurfer]);
 
   return (
     <Card className="overflow-x-hidden min-h-[82vh]">

@@ -28,7 +28,7 @@ import ScoreChart from "@/components/score-chart";
 import CodeEditor from "@monaco-editor/react";
 import { getDetailCode } from "@/services/get-interview-code";
 import Link from "next/link";
-import { getInterviewSuggestions } from "@/services/get-audio-suggestions";
+import { getAudioSuggestions } from "@/services/get-audio-suggestions";
 
 const Select = dynamic(
   () => import("@/components/ui/select").then((mod) => mod.Select),
@@ -41,27 +41,32 @@ const InterviewDetail = (props: {
   interviewTimes: InterviewTime[];
   initDetailData: DetailData;
   initCodeData: Code;
-  audioSuggestions: AudioSuggestion[];
+  initAudioSuggestions: AudioSuggestion[];
 }) => {
   const router = useRouter();
   const id = router.query.timeId as string;
-  const { interviewTimes, initDetailData, initCodeData, audioSuggestions } =
+  const { interviewTimes, initDetailData, initCodeData, initAudioSuggestions } =
     props;
   const [timeId, setTimeId] = useState<string>(id ? id : interviewTimes[1].id);
   const [scoreTab, setScoreTab] = useState<string>("overall");
   const [detailData, setDetailData] = useState<DetailData>(initDetailData);
   const [codeData, setCodeData] = useState<Code>(initCodeData);
+  const [audioSuggestions, setAudioSuggestions] =
+    useState<AudioSuggestion[]>(initAudioSuggestions);
 
   const fetchDetailData = async (timeId: string) => {
     const data = await getDetailData(timeId);
-    console.log(data);
     setDetailData(data || {});
   };
 
   const fetchCodeData = async (timeId: string) => {
     const data = await getDetailCode(timeId);
-    console.log(data);
     setCodeData(data || {});
+  };
+
+  const fetchAudioSuggestions = async (timeId: string) => {
+    const data = await getAudioSuggestions(timeId);
+    setAudioSuggestions(data || []);
   };
 
   return (
@@ -81,9 +86,10 @@ const InterviewDetail = (props: {
                 if (timeId === interviewTimes[0].id) {
                   router.push("/dashboard");
                 } else {
-                  router.push(`/dashboard/detail/${timeId}`);
                   fetchDetailData(timeId);
                   fetchCodeData(timeId);
+                  fetchAudioSuggestions(timeId);
+                  router.push(`/dashboard/detail/${timeId}`);
                 }
               }}
             >
@@ -96,9 +102,7 @@ const InterviewDetail = (props: {
                   <DropdownMenuSeparator />
                   {interviewTimes?.map((item, index) => (
                     <SelectItem value={item.id} key={index}>
-                      <Link href={`/dashboard/detail/${item.id}`}>
-                        {item.time}
-                      </Link>
+                      {item.time}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -109,6 +113,7 @@ const InterviewDetail = (props: {
         <ResizablePanelGroup direction="horizontal" className="h-full">
           <ResizablePanel className="h-full">
             <AudioAnalysis
+              key={timeId}
               timeId={timeId}
               audioSuggestions={audioSuggestions}
             ></AudioAnalysis>
@@ -247,7 +252,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     params!.timeId as string
   );
   const initCodeData: Code = await getDetailCode(params!.timeId as string);
-  const audioSuggestions = await getInterviewSuggestions(
+  const initAudioSuggestions = await getAudioSuggestions(
     params!.timeId as string
   );
 
@@ -256,7 +261,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       interviewTimes: interviewTimes,
       initDetailData: initDetailData,
       initCodeData: initCodeData,
-      audioSuggestions: audioSuggestions,
+      initAudioSuggestions: initAudioSuggestions,
     },
   };
 }
