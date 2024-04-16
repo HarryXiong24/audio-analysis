@@ -1,4 +1,4 @@
-import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWavesurfer } from "@wavesurfer/react";
 import { formatTime } from "@/lib/format-time";
 import { Button } from "@/components/ui/button";
@@ -15,16 +15,15 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import { Slider } from "../ui/slider";
+} from "../../ui/card";
+import { Slider } from "../../ui/slider";
 import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js";
 import Hover from "wavesurfer.js/dist/plugins/hover.esm.js";
 import Minimap from "wavesurfer.js/dist/plugins/minimap.esm.js";
 import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js";
-import { Checkbox } from "../ui/checkbox";
+import { Checkbox } from "../../ui/checkbox";
 import { AudioSuggestion } from "@/types";
 import AISuggestion from "../ai-suggestion";
 
@@ -272,6 +271,7 @@ const AudioAnalysis = (props: {
         </div>
         <div>
           <AISuggestion
+            timeId={timeId}
             isPlaying={isPlaying}
             audioSuggestions={audioSuggestions}
             currentRegionId={currentRegionId.current}

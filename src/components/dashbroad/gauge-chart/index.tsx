@@ -1,4 +1,4 @@
-import EChart from "../common/echarts";
+import EChart from "../../common/echarts";
 import { CSSProperties } from "react";
 
 const GaugeChart = (props: {

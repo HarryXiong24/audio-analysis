@@ -73,3 +73,13 @@ export interface AudioSuggestion {
   end: number;
   suggestion: string;
 }
+
+export interface TargetTrainingData {
+  id: number;
+  imgUrl: string;
+  title: string;
+  description: string;
+  time: string;
+  linName: string;
+  link: string;
+}

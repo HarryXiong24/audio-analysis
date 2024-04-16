@@ -8,27 +8,32 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getInterviewTimes } from "@/services/get-interview-times";
-import { AudioSuggestion, Code, DetailData, InterviewTime } from "@/types";
+import {
+  AudioSuggestion,
+  Code,
+  DetailData,
+  InterviewTime,
+  TargetTrainingData,
+} from "@/types";
 import { GetServerSidePropsContext } from "next";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import AudioAnalysis from "@/components/audio-analysis";
+import { useEffect, useRef, useState } from "react";
+import AudioAnalysis from "@/components/dashbroad-detail/audio-analysis";
 import Footer from "@/components/layout/footer";
 import { getDetailData } from "@/services/get-interview-detail";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScoreCriteria } from "../..";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import ScoreChart from "@/components/score-chart";
 import CodeEditor from "@monaco-editor/react";
 import { getDetailCode } from "@/services/get-interview-code";
-import Link from "next/link";
 import { getAudioSuggestions } from "@/services/get-audio-suggestions";
+import OverallScorePanel from "@/components/dashbroad-detail/overall-score-panel";
+import { getTargetTrainingData } from "@/services/get-target-training";
 
 const Select = dynamic(
   () => import("@/components/ui/select").then((mod) => mod.Select),
@@ -42,17 +47,27 @@ const InterviewDetail = (props: {
   initDetailData: DetailData;
   initCodeData: Code;
   initAudioSuggestions: AudioSuggestion[];
+  initTargetTrainingData: TargetTrainingData[];
 }) => {
   const router = useRouter();
   const id = router.query.timeId as string;
-  const { interviewTimes, initDetailData, initCodeData, initAudioSuggestions } =
-    props;
+  const {
+    interviewTimes,
+    initDetailData,
+    initCodeData,
+    initAudioSuggestions,
+    initTargetTrainingData,
+  } = props;
   const [timeId, setTimeId] = useState<string>(id ? id : interviewTimes[1].id);
-  const [scoreTab, setScoreTab] = useState<string>("overall");
   const [detailData, setDetailData] = useState<DetailData>(initDetailData);
   const [codeData, setCodeData] = useState<Code>(initCodeData);
   const [audioSuggestions, setAudioSuggestions] =
     useState<AudioSuggestion[]>(initAudioSuggestions);
+  const [targetTrainingData, setTargetTrainingData] = useState<
+    TargetTrainingData[]
+  >(initTargetTrainingData);
+  const audioRef = useRef<HTMLDivElement>(null);
+  const [rightPanelHeight, setRightPanelHeight] = useState<number>(0);
 
   const fetchDetailData = async (timeId: string) => {
     const data = await getDetailData(timeId);
@@ -68,6 +83,30 @@ const InterviewDetail = (props: {
     const data = await getAudioSuggestions(timeId);
     setAudioSuggestions(data || []);
   };
+
+  const fetchTargetTrainingData = async (timeId: string) => {
+    const data = await getTargetTrainingData(timeId);
+    setTargetTrainingData(data || []);
+  };
+
+  useEffect(() => {
+    const audioDiv = audioRef.current;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        console.log(entry);
+        const height = (entry.target as any).offsetHeight;
+        console.log(height);
+        setRightPanelHeight(height);
+      }
+    });
+
+    audioDiv && resizeObserver.observe(audioDiv);
+
+    return () => {
+      audioDiv && resizeObserver.unobserve(audioDiv);
+    };
+  }, []);
 
   return (
     <>
@@ -89,6 +128,7 @@ const InterviewDetail = (props: {
                   fetchDetailData(timeId);
                   fetchCodeData(timeId);
                   fetchAudioSuggestions(timeId);
+                  fetchTargetTrainingData(timeId);
                   router.push(`/dashboard/detail/${timeId}`);
                 }
               }}
@@ -112,15 +152,17 @@ const InterviewDetail = (props: {
         </div>
         <ResizablePanelGroup direction="horizontal" className="h-full">
           <ResizablePanel className="h-full">
-            <AudioAnalysis
-              key={timeId}
-              timeId={timeId}
-              audioSuggestions={audioSuggestions}
-            ></AudioAnalysis>
+            <div ref={audioRef}>
+              <AudioAnalysis
+                key={timeId}
+                timeId={timeId}
+                audioSuggestions={audioSuggestions}
+              ></AudioAnalysis>
+            </div>
           </ResizablePanel>
           <ResizableHandle className="mx-1" />
           <ResizablePanel className="h-full">
-            <Card className="min-h-[82vh]">
+            <Card className="h-full" style={{ height: rightPanelHeight }}>
               <CardContent className="p-6">
                 <Tabs defaultValue="code" className="w-full">
                   <TabsList className="grid grid-cols-2 w-1/3">
@@ -170,68 +212,10 @@ const InterviewDetail = (props: {
                     </ResizablePanelGroup>
                   </TabsContent>
                   <TabsContent value="score">
-                    <div className="float-right">
-                      <Select
-                        value={scoreTab}
-                        onValueChange={(value: string) => {
-                          setScoreTab(value);
-                        }}
-                      >
-                        <SelectTrigger className="w-56">
-                          <SelectValue placeholder="Select your score" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Score</SelectLabel>
-                            <DropdownMenuSeparator />
-                            {Object.keys(ScoreCriteria)?.map((item, index) => (
-                              <SelectItem value={item} key={index}>
-                                {
-                                  ScoreCriteria[
-                                    item as keyof typeof ScoreCriteria
-                                  ]
-                                }
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      {detailData.score &&
-                        Object.keys(detailData.score)?.map((item, index) => {
-                          if (item === scoreTab) {
-                            return (
-                              <div key={index}>
-                                <ScoreChart
-                                  name={
-                                    ScoreCriteria[
-                                      item as keyof typeof ScoreCriteria
-                                    ]
-                                  }
-                                  value={detailData.score[item]}
-                                  style={{
-                                    width: "50%",
-                                    height: 200,
-                                  }}
-                                />
-                                <div>
-                                  <h3 className="text-xl mb-4">AI Review</h3>
-                                  <p className="text-base text-neutral-500 ">
-                                    {
-                                      (
-                                        detailData[
-                                          item as keyof typeof detailData
-                                        ] as any
-                                      ).suggestion
-                                    }
-                                  </p>
-                                </div>
-                              </div>
-                            );
-                          }
-                        })}
-                    </div>
+                    <OverallScorePanel
+                      detailData={detailData}
+                      targetTrainingData={targetTrainingData}
+                    ></OverallScorePanel>
                   </TabsContent>
                 </Tabs>
               </CardContent>
@@ -255,6 +239,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const initAudioSuggestions = await getAudioSuggestions(
     params!.timeId as string
   );
+  const initTargetTrainingData: TargetTrainingData[] =
+    await getTargetTrainingData(params!.timeId as string);
 
   return {
     props: {
@@ -262,6 +248,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       initDetailData: initDetailData,
       initCodeData: initCodeData,
       initAudioSuggestions: initAudioSuggestions,
+      initTargetTrainingData: initTargetTrainingData,
     },
   };
 }

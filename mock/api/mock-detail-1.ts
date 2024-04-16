@@ -98,14 +98,14 @@ export const MockDetailAudioSuggestions = [
     start: 20,
     end: 50,
     suggestion:
-      "When preparing for an interview, it's important to thoroughly research the company and the role you are applying for, ensuring that you understand their mission, culture, and the specific responsibilities associated with the position, while also practicing your responses to common interview questions and scenarios, but remember to remain flexible and ready to engage in a conversation rather than delivering rehearsed responses, and it’s equally crucial to prepare some insightful questions to ask the interviewer, as this demonstrates your genuine interest in the position and helps you determine if the company’s environment and values align with your professional goals.",
+      "When preparing for an interview, it's important to thoroughly research the company and the role you are applying for, ensuring that you understand their mission, culture, and the specific responsibilities associated with the position, while also practicing your responses to common interview questions and scenarios, but remember to remain flexible and ready to engage in a conversation rather than delivering rehearsed responses, and it’s equally crucial to prepare some insightful questions to ask the interviewer, as this demonstrates your genuine interest in the position.",
   },
   {
     id: "3",
     start: 80,
     end: 120,
     suggestion:
-      "When preparing for an interview, it's important to thoroughly research the company and the role you are applying for, ensuring that you understand their mission, culture, and the specific responsibilities associated with the position, while also practicing your responses to common interview questions and scenarios, but remember to remain flexible and ready to engage in a conversation rather than delivering rehearsed responses, and it’s equally crucial to prepare some insightful questions to ask the interviewer, as this demonstrates your genuine interest in the position and helps you determine if the company’s environment and values align with your professional goals.",
+      "When preparing for an interview, it's important to thoroughly research the company and the role you are applying for, ensuring that you understand their mission, culture, and the specific responsibilities associated with the position, while also practicing your responses to common interview questions and scenarios, but remember to remain flexible and ready to engage in a conversation rather than delivering rehearsed responses, and it’s equally crucial to prepare some insightful questions to ask the interviewer, as this demonstrates your genuine interest in the position.",
   },
   {
     id: "4",
@@ -127,5 +127,35 @@ export const MockDetailAudioSuggestions = [
     end: 280,
     suggestion:
       "Sdghsdgsgadisytd CCCCCCC test suggestion, test suggestion, test suggestion, test suggestion",
+  },
+];
+
+export const MockTargetTrainingData = [
+  {
+    id: 1,
+    imgUrl: "https://github.com/vercel.png",
+    title: "How to do communication better",
+    description: "Free Course.",
+    time: "Joined May 2024",
+    linName: "Click here to join",
+    link: "",
+  },
+  {
+    id: 2,
+    imgUrl: "https://github.com/vercel.png",
+    title: "Leetcode 95 - Unique Binary Search Trees II",
+    description: "Targeted Problem Training.",
+    time: "Joined May 2024",
+    linName: "Click here to have test",
+    link: "",
+  },
+  {
+    id: 3,
+    imgUrl: "https://github.com/vercel.png",
+    title: "Practice your speaking skills",
+    description: "Free Blog to help your interview better.",
+    time: "Joined May 2024",
+    linName: "Click here to read",
+    link: "",
   },
 ];
