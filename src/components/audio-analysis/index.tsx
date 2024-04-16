@@ -260,9 +260,19 @@ const AudioAnalysis = (props: {
               </Button>
             </div>
           </div>
+          <div>
+            <p className="text-base text-left mt-4">
+              Transcript:
+              <span className="text-base text-neutral-500 text-left mx-2">
+                The recognition subtitles are transcribed by the server, they
+                are omitted here now.
+              </span>
+            </p>
+          </div>
         </div>
         <div>
           <AISuggestion
+            isPlaying={isPlaying}
             audioSuggestions={audioSuggestions}
             currentRegionId={currentRegionId.current}
           ></AISuggestion>
