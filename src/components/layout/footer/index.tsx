@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 const Typewriter = (props: {
   phrases: string[];
@@ -92,12 +92,12 @@ const Footer = () => {
           Interaction and engagement often make or break an interview.
         </p>
         <p className="text-start text-lg text-gray-500">
-          We built Mock<sup className="text-xs">AI</sup> as an immersive
+          We built Interview<sup className="text-xs">AI</sup> as an immersive
           experience to help you prepare for your next interview.
         </p>
         <a
           className="inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 underline-offset-4 hover:underline h-10 py-2 group px-0 text-base text-gray-500 underline shadow-none hover:border-b hover:border-none hover:text-primary hover:shadow-none"
-          href="/interviews"
+          href=""
         >
           Try it out for free
           <ArrowRight className="w-4 h-4 lucide lucide-arrow-right ml-2 transition-transform duration-200 group-hover:translate-x-2"></ArrowRight>
@@ -108,34 +108,6 @@ const Footer = () => {
         role="none"
         className="shrink-0 bg-border h-[1px] w-full"
       ></div>
-      <div className="flex h-[10rem] w-full flex-col items-center justify-center space-y-2">
-        <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground bg-white text-sm">
-          Alpha Launch
-        </div>
-        <div className="flex flex-row items-center justify-center space-x-2">
-          <div className="h-2 w-2 animate-pulse rounded-full bg-green-500"></div>
-          <p className="text-sm text-center text-gray-500">
-            All systems online
-          </p>
-        </div>
-        <div className="flex flex-row items-center justify-center space-x-2">
-          <p className="text-sm text-center text-gray-500">
-            © 2024 LeetGPT. All rights reserved.
-          </p>
-          <div
-            data-orientation="vertical"
-            role="none"
-            className="shrink-0 bg-border w-[1px] h-4"
-          ></div>
-          <span className="text-sm text-gray-500">Terms</span>
-          <div
-            data-orientation="vertical"
-            role="none"
-            className="shrink-0 bg-border w-[1px] h-4"
-          ></div>
-          <span className="text-sm text-gray-500">Privacy</span>
-        </div>
-      </div>
     </footer>
   );
 };
